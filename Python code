@@ -1,0 +1,152 @@
+#...................................... python code for that  ................................................................
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import zscore
+import warnings
+
+warnings.filterwarnings('ignore')
+sns.set(style="whitegrid")
+
+# Step 1: Load the dataset
+df = pd.read_csv("C:\\Users\\mukun\\OneDrive\\Documents\\python poject\\Crash_Data_Report in python\\1.08_Crash_Data_Report_(detail) (1).csv")
+
+# Step 2: Dataset Info
+print("\n--- Dataset Info ---")
+print(df.info())
+print("\n--- Dataset Summary ---")
+print(df.describe(include='all'))
+
+# Step 3: Handle missing values
+df = df.drop(columns=df.columns[df.isnull().mean() > 0.5])  # Drop columns with >50% missing
+df = df.dropna()  # Drop remaining rows with NaNs
+
+# Step 4: Extract date & time features
+if 'DateTime' in df.columns:
+    df['DateTime'] = pd.to_datetime(df['DateTime'], errors='coerce')
+    df = df.dropna(subset=['DateTime'])
+    df['DateTime'] = df['DateTime'].dt.tz_localize(None)
+    df['Month'] = df['DateTime'].dt.to_period('M')
+    df['DayOfWeek'] = df['DateTime'].dt.day_name()
+    df['Hour'] = df['DateTime'].dt.hour
+else:
+    print("DateTime column not found. Skipping datetime features.")
+
+# Step 5: Correlation Heatmap
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.select_dtypes(include='number').corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap")
+plt.tight_layout()
+plt.savefig("correlation_heatmap.png")
+plt.show()
+
+# Step 6: Monthly Crash Frequency
+if 'Month' in df.columns:
+    df.groupby('Month').size().plot(marker='o', color='tomato', title="Monthly Crash Frequency")
+    plt.xlabel("Month")
+    plt.ylabel("Number of Crashes")
+    plt.tight_layout()
+    plt.savefig("monthly_crashes.png")
+    plt.show()
+
+
+# Step 7: Injury Severity Distribution
+if 'Injuryseverity' in df.columns:
+    df['Injuryseverity'].value_counts().plot(kind='bar', color='mediumseagreen', title="Crash Severity Distribution")
+    plt.xlabel("Severity")
+    plt.tight_layout()
+    plt.savefig("crash_severity.png")
+    plt.show()
+
+
+# Step 8: Environmental Factors
+# Step 8: Environmental Factors
+for col in ['Weather', 'Lightcondition', 'SurfaceCondition']:
+    if col in df.columns and 'Injuryseverity' in df.columns:
+        plt.figure(figsize=(10, 5))
+        sns.countplot(data=df, x=col, hue='Injuryseverity', palette='Set2')
+        plt.title(f'Crash Severity by {col}')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig(f'crash_by_{col}.png')
+        plt.show()
+
+# Step 9: Alcohol & Drug Influence
+for col in ['AlcoholUse_Drv1', 'DrugUse_Drv1']:
+    if col in df.columns and 'Injuryseverity' in df.columns:
+        plt.figure(figsize=(6, 4))
+        sns.countplot(data=df, x=col, hue='Injuryseverity', palette='Set1')
+        plt.title(f'{col} vs Injury Severity')
+        plt.tight_layout()
+        plt.savefig(f'{col}_vs_severity.png')
+        plt.show()
+
+# Step 10: Collision Types
+if 'Collisionmanner' in df.columns:
+    plt.figure(figsize=(8, 6))
+    sns.countplot(data=df, y='Collisionmanner',
+                  order=df['Collisionmanner'].value_counts().index,
+                  palette='Pastel1')
+    plt.title("Most Common Collision Types")
+    plt.tight_layout()
+    plt.savefig("collision_types.png")
+    plt.show()
+
+# Step 11: Common Violations by Driver 1
+if 'Violation1_Drv1' in df.columns:
+    df['Violation1_Drv1'].value_counts().head(10).plot(
+        kind='barh', color='mediumvioletred')
+    plt.title("Top 10 Violations by Driver 1")
+    plt.xlabel("Count")
+    plt.tight_layout()
+    plt.savefig("top_driver1_violations.png")
+    plt.show()
+
+# Step 12: Crash Timing Patterns
+if 'DayOfWeek' in df.columns:
+    sns.countplot(data=df, x='DayOfWeek',
+                  order=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                  palette='coolwarm')
+    plt.title("Crashes by Day of the Week")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("crash_by_day.png")
+    plt.show()
+
+if 'Hour' in df.columns:
+    sns.countplot(data=df, x='Hour', color='mediumslateblue')
+    plt.title("Crashes by Hour of the Day")
+    plt.tight_layout()
+    plt.savefig("crash_by_hour.png")
+    plt.show()
+
+# Step 13: Outlier Detection (IQR Method)
+num = df.select_dtypes(include=["number"]).columns
+q1 = df[num].quantile(0.25)
+q3 = df[num].quantile(0.75)
+IQR = q3 - q1
+lower_bound = q1 - 1.5 * IQR
+upper_bound = q3 + 1.5 * IQR
+outliers_iqr = ((df[num] < lower_bound) | (df[num] > upper_bound)).sum()
+print("\n--- Outliers Detected using IQR ---")
+print(outliers_iqr)
+
+plt.figure(figsize=(15, 8))
+sns.boxplot(data=df[num], palette='Set3')
+plt.title("Boxplot for Outlier Detection (IQR)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("outliers_boxplot_iqr.png")
+plt.show()
+
+# Step 14: Outlier Detection (Z-score Method)
+z_scores = np.abs(zscore(df[num]))
+outliers_zscore = (z_scores > 3).sum()
+print("\n--- Outliers Detected using Z-score ---")
+print(outliers_zscore)
+
+# Optional: Save Z-score result
+zscore_df = pd.DataFrame(z_scores, columns=num)
+zscore_df.to_csv("zscore_outliers.csv", index=False)
