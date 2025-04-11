@@ -79,5 +79,5 @@ If you're interested in data analytics, Python projects, or road safety research
 
 🔖 Tags
 
-#Python #DataScience #EDA #CrashData #RoadSafety #Matplotlib #StudentProject
+#Python #DataScience #EDA #CrashData #RoadSafety #Matplotlib #StudentProject #cse
 
