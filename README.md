@@ -4,7 +4,6 @@
 This project is a detailed analysis of a real-world crash dataset using Python, with a strong focus on Exploratory Data Analysis (EDA), data visualization, and statistical insights. The goal is to extract patterns, trends, and risk factors to improve road safety and support data-driven decision-making.
 
 📌 Project Objectives
-
 Identify peak accident times and days
 
 Study injury severity and its influencing factors
