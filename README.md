@@ -9,7 +9,6 @@ Identify peak accident times and days
 Study injury severity and its influencing factors
 
 Analyze the effect of weather, road, and light conditions
-
 Evaluate the impact of alcohol and drug use
 
 Detect frequent traffic violations and collision types
