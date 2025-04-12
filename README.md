@@ -1,4 +1,4 @@
-# Crash-Data-Analysis
+#......................... Crash-Data-Analysis ............................
 🚗 Crash Data Analysis using Python & EDA
 
 This project is a detailed analysis of a real-world crash dataset using Python, with a strong focus on Exploratory Data Analysis (EDA), data visualization, and statistical insights. The goal is to extract patterns, trends, and risk factors to improve road safety and support data-driven decision-making.
@@ -9,7 +9,6 @@ Identify peak accident times and days
 Study injury severity and its influencing factors
 
 Analyze the effect of weather, road, and light conditions
-
 Evaluate the impact of alcohol and drug use
 
 Detect frequent traffic violations and collision types
