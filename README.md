@@ -7,7 +7,6 @@ This project is a detailed analysis of a real-world crash dataset using Python, 
 Identify peak accident times and days
 
 Study injury severity and its influencing factors
-
 Analyze the effect of weather, road, and light conditions
 
 Evaluate the impact of alcohol and drug use
